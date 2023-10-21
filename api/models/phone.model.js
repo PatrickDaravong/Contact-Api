@@ -12,7 +12,7 @@ module.exports = (sequelize, Sequelize) => {
         },
 
         number: {
-            type: Sequelize.STRING     
+            type: Sequelize.STRING
         },
 
         contactId: {

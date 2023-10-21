@@ -8,7 +8,6 @@ exports.create = (req, res) => {
     const contact ={
         name: req.body.name,
     };
-
     Contacts.create(contact)
         .then(data => {
             res.send(data);
@@ -18,7 +17,6 @@ exports.create = (req, res) => {
                 message: err.message || "Some error occurred"
             });
         });
-    
 };
 
 // Get all contacts
@@ -36,7 +34,7 @@ exports.findAll = (req, res) => {
 
 // Get one contact by id
 exports.findOne = (req, res) => {
-    const Id = req.params.id;
+    const Id = req.params.contactId;
     Contacts.findByPk(Id)
     .then((contact)=> {
         if(!contact){
@@ -58,24 +56,32 @@ exports.update = (req, res) => {
 
 // Delete one contact by id
 exports.delete = (req, res) => {
-    const id = req.params.id
+    const id = req.params.contactId; // Use 'contactId' instead of 'id'
+    console.log("Received id:", id);
+
     Contacts.destroy({
-        where: {id:id}
+        where: { id }
     })
     .then(num => {
-        if (num == 1){
-            res.send({
+        if (num === 1) {
+            res.status(200).send({
                 message: "Contact was deleted successfully"
             });
+        } else if (num === 0) {
+            res.status(404).send({
+                message: "Contact not found"
+            });
         } else {
-            res.send({
-                message: 'Cannot delete contact'
+            res.status(500).send({
+                message: 'Error deleting contact'
             });
         }
     })
     .catch(err => {
+        console.error("Error deleting contact:", err);
         res.status(500).send({
-            message: "Could not delete the contact with id ="+id
-        })
-    })
+            message: "Could not delete the contact with id = " + id
+        });
+    });
 };
+

@@ -4,6 +4,7 @@ import './App.css';
 function App() {
   const [contactName, setContactName] = useState('');
   const [contacts, setContacts] = useState([]);
+  
 
   useEffect(() => {
     fetch('http://localhost/api/contacts')
@@ -37,10 +38,9 @@ function App() {
   };
 
   const handleDeleteContact = (contactIndex) => {
-    console.log(contacts); // Add this line for debugging
-    const contact = contacts[contactIndex]; // Get the contact you want to delete
-    const contactId = contact.id; // Get the contact's ID
-    fetch(`http://localhost/api/contacts/${contact.id}`, {
+    const contact = contacts[contactIndex]; 
+    const contactId = contact.id;
+    fetch(`http://localhost/api/contacts/${contactId}`, {
       method: 'DELETE', 
     })
       .then(() => {
@@ -54,18 +54,47 @@ function App() {
   };
   
   
-
   const handleAddInfo = (contactIndex) => {
+    console.log('handleAddInfo called'); 
     const newContacts = [...contacts];
-    if (newContacts[contactIndex] && newContacts[contactIndex].name.trim() !== '') {
-      newContacts[contactIndex].names.push(newContacts[contactIndex].name);
-      newContacts[contactIndex].phoneNumbers.push(newContacts[contactIndex].phoneNumber);
-      newContacts[contactIndex].name = ''; // Reset the name input
-      newContacts[contactIndex].phoneNumber = ''; // Reset the phone number input
-      setContacts(newContacts);
+    const contact = newContacts[contactIndex];
+  
+    console.log('phoneName:', contact.phoneName); 
+    console.log('phoneNumber:', contact.phoneNumber); 
+
+    if (contact && contact.phoneName && contact.phoneNumber) {
+      const trimmedPhoneName = contact.phoneName.trim();
+      const trimmedPhoneNumber = contact.phoneNumber.trim();
+  
+      if (trimmedPhoneName !== '' && trimmedPhoneNumber !== '') {
+        const phoneData = {
+          name: trimmedPhoneName, 
+          number: trimmedPhoneNumber,
+          contactId: contact.id, 
+        };
+
+        fetch('http://localhost:5000/api/contacts/' + contact.id + '/phones', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(phoneData),
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            console.log('New phone record:', data);
+  
+            contact.phoneName = '';
+            contact.phoneNumber = '';
+  
+            setContacts(newContacts);
+          })
+          .catch((error) => {
+            console.error('Error creating phone record:', error);
+          });
+      }
     }
   };
-  
   
   const handleDeleteEntry = (contactIndex, entryIndex) => {
     const newContacts = [...contacts];
@@ -108,19 +137,29 @@ function App() {
               </button>
             </div>
             <div className="input-container">
-              <input
-                type="text"
-                placeholder="Name"
-                className="input-box2"
-              />
-              <input
-                type="text"
-                placeholder="Phone Number"
-                className="input-box2"
-              />
-              <button className="add-button">
-                Add
-              </button>
+            <input
+            type="text"
+            placeholder="Phone Name"
+            className="input-box2"
+            value={contact.phoneName}
+            onChange={(e) => {
+            const newContacts = [...contacts];
+            newContacts[contactIndex].phoneName = e.target.value;
+            setContacts(newContacts);
+            }}/>
+            <input
+            type="text"
+            placeholder="Phone Number"
+            className="input-box2"
+            value={contact.phoneNumber}
+            onChange={(e) => {
+              const newContacts = [...contacts];
+              newContacts[contactIndex].phoneNumber = e.target.value;
+              setContacts(newContacts);
+              }}/>
+            <button className="add-button" onClick={() => handleAddInfo(contactIndex)}>
+            Add
+            </button>
             </div>
             <div className="contact-details">
               <div>
