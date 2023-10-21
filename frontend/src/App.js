@@ -65,14 +65,15 @@ function App() {
     if (contact && contact.phoneName && contact.phoneNumber) {
       const trimmedPhoneName = contact.phoneName.trim();
       const trimmedPhoneNumber = contact.phoneNumber.trim();
-  
+      console.log('phoneNumber123:', contact.phoneNumber); 
+
       if (trimmedPhoneName !== '' && trimmedPhoneNumber !== '') {
         const phoneData = {
           name: trimmedPhoneName, 
           number: trimmedPhoneNumber,
           contactId: contact.id, 
-        };
 
+        };
         fetch('http://localhost:5000/api/contacts/' + contact.id + '/phones', {
           method: 'POST',
           headers: {
@@ -83,10 +84,9 @@ function App() {
           .then((response) => response.json())
           .then((data) => {
             console.log('New phone record:', data);
-  
             contact.phoneName = '';
             contact.phoneNumber = '';
-  
+
             setContacts(newContacts);
           })
           .catch((error) => {
