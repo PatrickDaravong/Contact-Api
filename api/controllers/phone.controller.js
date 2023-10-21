@@ -1,4 +1,5 @@
 const db = require("../models");
+const contactModel = require("../models/contact.model");
 const Phones = db.phones;
 const Op = db.Sequelize.Op;
 
@@ -6,9 +7,10 @@ const Op = db.Sequelize.Op;
 exports.create = (req, res) => {
     const phone ={
         name: req.body.name,
-        number: req.body.phone,
+        number: req.body.number,
+        contactId: req.body.contactId,
     };
-
+    
     Phones.create(phone)
         .then(data => {
             res.send(data);
