@@ -51,12 +51,41 @@ exports.findOne = (req, res) => {
 
 // Update one contact by id
 exports.update = (req, res) => {
-};
+    const id = req.params.contactId; 
+    console.log("Received id:", id);
+    const updateContact ={
+        //newcontactid: req.body.contactId
+    };
 
+    Contacts.update(updateContact,{
+        where: { id }
+    })
+    .then(num => {
+        if (num === 1) {
+            res.status(200).send({
+                message: "Contact was updated successfully"
+            });
+        } else if (num === 0) {
+            res.status(404).send({
+                message: "Contact not found"
+            });
+        } else {
+            res.status(500).send({
+                message: 'Error updating contact'
+            });
+        }
+    })
+    .catch(err => {
+        console.error("Error updating contact:", err);
+        res.status(500).send({
+            message: "Could not updating the contact with id = " + id
+        });
+    });
+};
 
 // Delete one contact by id
 exports.delete = (req, res) => {
-    const id = req.params.contactId; // Use 'contactId' instead of 'id'
+    const id = req.params.contactId; 
     console.log("Received id:", id);
 
     Contacts.destroy({

@@ -1,4 +1,4 @@
-import React, { useState, useEffect} from 'react';
+import React, { useState} from 'react';
 import './App.css';
 
 function App() {
@@ -6,17 +6,6 @@ function App() {
   const [contacts, setContacts] = useState([]);
   const [phoneEntries, setPhoneEntries] = useState([]);
   const [stats, setStats] = useState(null);
-
-  useEffect(() => {
-    fetch('http://localhost/api/contacts')
-      .then((response) => response.json())
-      .then((data) => {
-        setContactName(data.name); 
-      })
-      .catch((error) => {
-        console.error('ERROR:', error);
-      });
-  }, []);
   
   const handleCreateContactClick = () => {
     if (contactName.trim() !== '') {
@@ -112,9 +101,9 @@ function App() {
   };
   
   const handleDeleteEntry = (entryIndex) => {
-  const entry = phoneEntries[entryIndex];
-  const contactId = entry.contactId;
-  const phoneId = entry.id;
+    const entry = phoneEntries[entryIndex];
+    const contactId = entry.contactId;
+    const phoneId = entry.id;
 
   console.log('ContactID:', contactId);
   console.log('phoneId:', phoneId);
@@ -134,7 +123,6 @@ function App() {
 };
   
 const handleStatsButtonClick = () => {
-  // Fetch statistics data from the API
   fetch('http://localhost/api/stats')
     .then((response) => response.json())
     .then((data) => {
@@ -149,12 +137,14 @@ const handleCloseButtonClick = () => {
   setStats(null); 
 };
 
+
+
    
   return (
     <div>
       <h1 className="centered">Contactor</h1>
+      <h2 className="centered">Patrick Daravong</h2>
       <h2 className="centered">Get Started</h2>
-      <h2 className="centered">hello</h2>
 
       <div className="container">
         <h1 className="centered">Contacts</h1>
@@ -220,22 +210,24 @@ const handleCloseButtonClick = () => {
               >
               Delete
             </button>
-          </div>
-        </div>
-      ))}
-    </div>
-  ))}
-  </div>
-  <div>
-    <button className ='stat_button' onClick={() => handleStatsButtonClick()}>Stat Button</button>
-  </div>
-  {stats && (
+            </div>
+            </div>
+            ))}
+            </div>
+             ))}
+             </div>
+        <div>
+          <button className ='stat_button' onClick={() => handleStatsButtonClick()}>Stat Button</button>
+       </div>
+      {stats && (
         <div className = 'stat_container'>
           <h2>Statistics:</h2>
-          <p>Number of Contacts: {stats.numberOfContacts}</p>
-          <p>Number of Phone Numbers: {stats.numberOfPhoneNumbers}</p>
+          <p>The Number of Contacts: {stats.numberContacts}</p>
+          <p>The Number of Phone Numbers: {stats.numberPhoneNumbers}</p>
           <p>Most Recent Contact: {stats.mostRecentContact.name}</p>
           <p>Oldest Contact: {stats.oldestContact.name}</p>
+          <button className="refresh_button" onClick={handleStatsButtonClick}>
+            Refresh Stats</button>
           <button onClick={handleCloseButtonClick} className="close_button">
              Close
            </button>

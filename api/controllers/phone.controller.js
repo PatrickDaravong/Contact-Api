@@ -11,7 +11,6 @@ exports.create = (req, res) => {
         number: req.body.number,
         contactId: req.body.contactId,
     };
-
     Phones.create(phone)
         .then(data => {
             res.send(data);
@@ -39,30 +38,77 @@ exports.findAll = (req, res) => {
 
 // Get one phone by id
 exports.findOne = (req, res) => {
-    
-  
+    const Id = req.params.phoneId;
+    Phones.findByPk(Id)
+    .then((phone)=> {
+        if(!phone){
+            return res.status(404).send({message:'Phone not found'});
+        }
+        res.status(200).send(phone);
+    })
+    .catch((err)=> {
+        res.status(500).send({
+            message: 'Error retrieving Phone with ID ='+ Id,
+        });
+    });
 };
 
 // Update one phone by id
 exports.update = (req, res) => {
-    
-};
-
-// Delete one phone by id
-exports.delete = (req, res) => {
-    const id = req.params.id; // Use 'contactId' instead of 'id'
+    const id = req.params.phoneId; 
+    const contactId = req.params.contactId
+    console.log("Received contactId",contactId)
     console.log("Received id:", id);
-    Contacts.destroy({
-        where: { id }
+    
+    const updatePhone ={
+        //newPhoneid: req.body.phoneId
+    };
+
+    Phones.update(updatePhone,{
+        where: { id,
+            contactId},
     })
     .then(num => {
         if (num === 1) {
             res.status(200).send({
-                message: "Contact was deleted successfully"
+                message: "Phone was updated successfully"
             });
         } else if (num === 0) {
             res.status(404).send({
-                message: "Contact not found"
+                message: "Phone not found"
+            });
+        } else {
+            res.status(500).send({
+                message: 'Error deleting Phone'
+            });
+        }
+    })
+    .catch(err => {
+        console.error("Error update Phone:", err);
+        res.status(500).send({
+            message: "Could not update the Phone with id = " + id
+        });
+    });
+};
+
+// Delete one phone by id
+exports.delete = (req, res) => {
+    const id = req.params.phoneId; 
+    const contactId = req.params.contactId
+    console.log("Received contactId",contactId)
+    console.log("Received id:", id);
+    Phones.destroy({
+        where: { id,
+            contactId},
+    })
+    .then(num => {
+        if (num === 1) {
+            res.status(200).send({
+                message: "Phone was deleted successfully"
+            });
+        } else if (num === 0) {
+            res.status(404).send({
+                message: "Phone not found"
             });
         } else {
             res.status(500).send({
@@ -71,9 +117,9 @@ exports.delete = (req, res) => {
         }
     })
     .catch(err => {
-        console.error("Error deleting contact:", err);
+        console.error("Error deleting Phone:", err);
         res.status(500).send({
-            message: "Could not delete the contact with id = " + id
+            message: "Could not delete the Phone with id = " + id
         });
     });
 };

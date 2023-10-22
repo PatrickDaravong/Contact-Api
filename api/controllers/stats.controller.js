@@ -6,24 +6,23 @@ const Op = db.Sequelize.Op;
 // Calculate stats
 exports.calculate = (req, res) => {
     Contacts.count()
-    .then((numberOfContacts) => {
+    .then((numberContacts) => {
       Phones.count()
-        .then((numberOfPhoneNumbers) => {
+        .then((numberPhoneNumbers) => {
+            //we can use our other functions to find the specific contacts -> FIRST AND LAST 
           Contacts.findOne({
             order: [['createdAt', 'DESC']]
           }).then((mostRecentContact) => {
             Contacts.findOne({
               order: [['createdAt', 'ASC']]
             }).then((oldestContact) => {
-              // Create a JSON response object
               const statsData = {
-                numberOfContacts,
-                numberOfPhoneNumbers,
+                numberContacts,
+                numberPhoneNumbers,
                 mostRecentContact,
                 oldestContact,
               };
 
-              // Respond with the JSON object
               res.status(200).json(statsData);
             });
           });
