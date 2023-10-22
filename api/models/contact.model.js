@@ -7,10 +7,12 @@ module.exports = (sequelize, Sequelize) => {
         },
         // DEFINE YOUR MODEL HERE
         name: {
-            type: Sequelize.STRING     
+            type: Sequelize.STRING,  
+            allowNull: false,
+ 
         },
      });
-        
+     //Putting the relationship between contact and phone
       Contact.associate = (models) => {
         Contact.hasMany(models.Phone, {foreignKey: "contactId"});
     };

@@ -8,18 +8,24 @@ module.exports = (sequelize, Sequelize) => {
         // DEFINE YOUR MODEL HERE
 
         name: {
-            type: Sequelize.STRING     
+            type: Sequelize.STRING, 
+            allowNull: false,
         },
 
         number: {
-            type: Sequelize.STRING
+            type: Sequelize.STRING,    
+            allowNull: false,
+
         },
 
         contactId: {
-            type: Sequelize.INTEGER
+            type: Sequelize.INTEGER,
+            allowNull: false,
+
         }        
     });
 
+     //Putting the relationship between contact and phone
    Phone.associate = (models) => {
          Phone.belongsTo(models.Contact,{foreignKey: "contactId"});
     }
