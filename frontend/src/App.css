@@ -128,3 +128,45 @@
     background-color:#1fda79;
   }
   
+
+  .stat_button {
+    background-color:grey;
+    color:rgb(239, 234, 234);
+    padding: 4px 2px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px; 
+    text-align: center;
+    margin-top: 10%;
+    margin-left: 45%;
+    width: 10%;
+  } 
+
+  .stat_container{
+    display: flex;
+    flex-direction: column; /* Keep the inputs in a row */
+    align-items: center;
+  }
+
+
+  .stat_button:hover{
+    background-color:rgb(38, 38, 38);
+  }
+
+
+  .close_button{
+    background-color:grey;
+    color:rgb(239, 234, 234);
+    padding: 2px 1px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px; 
+    text-align: center;
+    width: 7%;
+  }
+  .close_button:hover{
+    background-color:rgb(245, 51, 51);
+
+  }

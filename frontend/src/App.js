@@ -4,7 +4,8 @@ import './App.css';
 function App() {
   const [contactName, setContactName] = useState('');
   const [contacts, setContacts] = useState([]);
-  
+  const [phoneEntries, setPhoneEntries] = useState([]);
+  const [stats, setStats] = useState(null);
 
   useEffect(() => {
     fetch('http://localhost/api/contacts')
@@ -16,7 +17,7 @@ function App() {
         console.error('ERROR:', error);
       });
   }, []);
-
+  
   const handleCreateContactClick = () => {
     if (contactName.trim() !== '') {
       fetch('http://localhost/api/contacts', { 
@@ -47,6 +48,10 @@ function App() {
         const newContacts = [...contacts];
         newContacts.splice(contactIndex, 1);
         setContacts(newContacts);
+
+        const updatedPhoneEntries = phoneEntries.filter((entry) => entry.contactId !== contactId);
+        setPhoneEntries(updatedPhoneEntries);
+        console.log("Deleted contact and associated phone entries.");
       })
       .catch((error) => {
         console.error('Error', error);
@@ -58,9 +63,6 @@ function App() {
     console.log('handleAddInfo called'); 
     const newContacts = [...contacts];
     const contact = newContacts[contactIndex];
-  
-    console.log('phoneName:', contact.phoneName); 
-    console.log('phoneNumber:', contact.phoneNumber); 
 
     if (contact && contact.phoneName && contact.phoneNumber) {
       const trimmedPhoneName = contact.phoneName.trim();
@@ -72,8 +74,11 @@ function App() {
           name: trimmedPhoneName, 
           number: trimmedPhoneNumber,
           contactId: contact.id, 
-
         };
+
+        console.log('phonedata',phoneData)
+        setPhoneEntries([...phoneEntries, phoneData]);
+
         fetch('http://localhost:5000/api/contacts/' + contact.id + '/phones', {
           method: 'POST',
           headers: {
@@ -84,10 +89,20 @@ function App() {
           .then((response) => response.json())
           .then((data) => {
             console.log('New phone record:', data);
+
+            const updatedPhoneEntry = {
+              id: data.id, 
+              name: trimmedPhoneName,
+              number: trimmedPhoneNumber,
+              contactId: contact.id,
+            };
+
+           
             contact.phoneName = '';
             contact.phoneNumber = '';
 
             setContacts(newContacts);
+            setPhoneEntries([...phoneEntries, updatedPhoneEntry]); 
           })
           .catch((error) => {
             console.error('Error creating phone record:', error);
@@ -96,12 +111,43 @@ function App() {
     }
   };
   
-  const handleDeleteEntry = (contactIndex, entryIndex) => {
-    const newContacts = [...contacts];
-    newContacts[contactIndex].names.splice(entryIndex, 1);
-    newContacts[contactIndex].phoneNumbers.splice(entryIndex, 1);
-    setContacts(newContacts);
-  };
+  const handleDeleteEntry = (entryIndex) => {
+  const entry = phoneEntries[entryIndex];
+  const contactId = entry.contactId;
+  const phoneId = entry.id;
+
+  console.log('ContactID:', contactId);
+  console.log('phoneId:', phoneId);
+
+  fetch(`http://localhost/api/contacts/${contactId}/phones/${phoneId}`, {
+    method: 'DELETE',
+  })
+    .then(() => {
+      const updatedPhoneEntries = [...phoneEntries];
+      updatedPhoneEntries.splice(entryIndex, 1);
+      setPhoneEntries(updatedPhoneEntries);
+      console.log("Deleted phone entry.");
+    })
+    .catch((error) => {
+      console.error('Error', error);
+    });
+};
+  
+const handleStatsButtonClick = () => {
+  // Fetch statistics data from the API
+  fetch('http://localhost/api/stats')
+    .then((response) => response.json())
+    .then((data) => {
+      setStats(data);
+    })
+    .catch((error) => {
+      console.error('Error fetching statistics:', error);
+    });
+};
+
+const handleCloseButtonClick = () => {
+  setStats(null); 
+};
 
    
   return (
@@ -161,19 +207,41 @@ function App() {
             Add
             </button>
             </div>
-            <div className="contact-details">
-              <div>
-                <div className="name"></div>
-                <div className="phone-number"></div>
-                <button className="delete-button">
-                  Delete
-                </button>
-              </div>
-            </div>
+            {phoneEntries
+            .filter((entry) => entry.contactId === contact.id)
+            .map((entry, entryIndex) => (
+            <div key={entryIndex} className="contact-details">
+            <div>
+            <div className="name">{entry.name}</div>
+            <div className="phone-number">{entry.number}</div>
+            <button
+              className="delete-button"
+              onClick={() => handleDeleteEntry(entryIndex)}
+              >
+              Delete
+            </button>
           </div>
-        ))}
-      </div>
+        </div>
+      ))}
     </div>
+  ))}
+  </div>
+  <div>
+    <button className ='stat_button' onClick={() => handleStatsButtonClick()}>Stat Button</button>
+  </div>
+  {stats && (
+        <div className = 'stat_container'>
+          <h2>Statistics:</h2>
+          <p>Number of Contacts: {stats.numberOfContacts}</p>
+          <p>Number of Phone Numbers: {stats.numberOfPhoneNumbers}</p>
+          <p>Most Recent Contact: {stats.mostRecentContact.name}</p>
+          <p>Oldest Contact: {stats.oldestContact.name}</p>
+          <button onClick={handleCloseButtonClick} className="close_button">
+             Close
+           </button>
+        </div>
+      )}
+  </div>
   );
 }
 
