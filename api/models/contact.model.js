@@ -9,7 +9,7 @@ module.exports = (sequelize, Sequelize) => {
         name: {
             type: Sequelize.STRING     
         },
-    });
+     });
         
       Contact.associate = (models) => {
         Contact.hasMany(models.Phone, {foreignKey: "contactId"});
